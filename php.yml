@@ -24,6 +24,5 @@ jobs:
           echo "Beginning script"
           # cd "<your-project-directory>"
           git fetch
-          git stash
           git pull origin main
           echo "Update completed"
