@@ -1,0 +1,51 @@
+name: PHP Website Deploy to Server
+
+# Trigger the workflow on push events on the main branch
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Test Script on PR
+      if: github.event_name == 'pull_request'
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        port: ${{ secrets.SERVER_PORT }}
+        script: |
+          echo "Running tests on pull request..."
+
+          # Place test commands here
+          # For example, if you're using PHPUnit:
+          # ./vendor/bin/phpunit
+
+          # cd "<your-project-directory>"
+          git fetch
+          echo "Tested script to update to server"
+
+    - name: Deploy to Server
+      if: github.event_name == 'push'
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        port: ${{ secrets.SERVER_PORT }}
+        script: |
+          echo "Beginning script"
+          # cd "<your-project-directory>"
+          git fetch
+          git stash
+          git pull origin main
+          echo "Update completed"
